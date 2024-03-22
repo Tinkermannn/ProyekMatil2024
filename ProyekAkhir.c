@@ -7,10 +7,13 @@
 #include "function.h"
 
 #define MAX_VOUCHER_CODE 20
+enum set{FALSE, TRUE};
 
 void printRainbowText(const char *text);
 void menuPetunjuk();
 void menuKonversi();
+void menuUtama();
+void conversiAll (int *cr);
 void reamur(float suhu);
 void celcius(float suhu);
 void fahrenheit(float suhu);
@@ -28,19 +31,12 @@ int main() {
     char suhuAwal;
     srand(time(NULL)); // Seed the random number generator
     int tigakalipakai = 0;
-    char email[50]; // Variabel untuk menyimpan email
+    char email[51]; // Variabel untuk menyimpan email
     char password[15]; // Variabel untuk menyimpan password
 
     do {
         do {
-            printf("+===========================+\n");
-            printRainbowText("|       Selamat datang      |\n");
-            printRainbowText("| di Program Konversi Suhu  |\n");
-            printf("+===========================+\n");
-            printf("| 1. Petunjuk               |\n");
-            printf("| 2. Konversi               |\n");
-            printf("| 0. Keluar                 |\n");
-            printf("+===========================+\n");
+            menuUtama();
             printf("Silakan pilih tujuan Anda: ");
             scanf("%d", &choice);
 
@@ -60,19 +56,71 @@ int main() {
                 system("cls");
                 break;
             case 2:
-                menuKonversi();
-                printf("Masukkan jenis suhu awal (R/C/F/K): ");
-                getchar();
-
-                while ((scanf("%c", &suhuAwal)) != EOF) {
-                    if (tigakalipakai == 3) {
-                        system("cls");
+            	if (tigakalipakai<3){
+	            	menuKonversi();
+	                printf("Masukkan jenis suhu awal (R/C/F/K): ");
+	                while ((scanf(" %c", &suhuAwal)) != EOF && tigakalipakai<3) {
+                    int input = TRUE;
+                    suhuAwal = toupper(suhuAwal);
+                    switch (suhuAwal) {
+                        case 'R':
+                            break;
+                        case 'C':
+                            break;
+                        case 'F':
+                            break;
+                        case 'K':
+                            break;
+                        default:
+                            input = FALSE;
+                            break;
+                    }
+                    if (input!=TRUE){
+                    	printf("Input tidak valid. Silakan coba lagi.\n");
+					}
+					else {
+						printf("Masukkan suhu: ");
+		                scanf("%f", &suhu);
+		                getchar();
+		                switch (suhuAwal) {
+		                	case 'R':
+		                	    reamur(suhu);
+		                	    tigakalipakai += 1;
+		               	    	break;
+		                	case 'C':
+		                    	celcius(suhu);
+		                        tigakalipakai += 3;
+		                        break;
+		                    case 'F':
+		                        fahrenheit(suhu);
+		                        tigakalipakai += 1;
+		                        break;
+		                    case 'K':
+		                        kelvin(suhu);
+		                        tigakalipakai += 1;
+		                        break;
+		                    default:
+		                        break;
+		                }	
+					}	  
+	                system("pause");
+	                system("cls");
+	                menuKonversi();
+	                printf("Masukkan jenis suhu awal (R/C/F/K): ");
+            		}
+				}
+                if (tigakalipakai >= 3) {
+                		system("cls");
                         printf("Anda sudah melebihi batas 3x percobaan\n");
-                        printf("Registrasi akun anda sekarang (Y/N):");
+                        printf("Registrasi akun anda sekarang (Y)\n");
+                        printf("Login ke akun yang tersedia (L)\n");
+                        printf("Ketik karakter lainnya untuk batal\n");
+                        printf("Pilihan anda : ");
                         char registChoice[2];
                         scanf("%s", registChoice);
 
                         if (strcmp(registChoice, "Y") == 0 || strcmp(registChoice, "y") == 0) {
+                        	system("cls");
                             FILE *akun;
                             akun = fopen("akun.txt","a");
                             printf("+======================================+\n");
@@ -88,136 +136,135 @@ int main() {
                             fclose(akun);
                             printf("Akun anda berhasil dibuat\n");
                             system("pause");
-                            system("cls");
-
-                            if (loginMenu(email,password) == 1) {
-                                int credit = 2;
-                                menuKonversi();
-                                printf("Masukkan jenis suhu awal (R/C/F/K): ");
-                                getchar();
-                                
-                                while ((scanf("%c", &suhuAwal)) != EOF) {
-                                    if (credit == 0) {
-                                        system("cls");
-                                        printf("Maaf credit Anda sudah habis\n");
-                                        printf("Masukkan kode voucher untuk melanjutkan (+1 credit).\n");
-                                        printf("+======================================+\n");
-                                        printRainbowText("|   Program Konversi Suhu Menu         |\n");
-                                        printf("+======================================+\n");
-                                        printf("| 1. Petunjuk                          |\n");
-                                        printf("| 2. Konversi                          |\n");
-                                        printf("| 3. TopUp dan Generate Voucher Code   |\n");
-                                        printf("| 4. Redeem Voucher Code               |\n");
-                                        printf("| 0. Keluar                            |\n");
-                                        printf("+======================================+\n");
-                                        printf("Silakan pilih tujuan Anda: ");
-                                        scanf("%d", &choiceLogin);
-
-                                        switch (choiceLogin) {
+                            system("cls"); 
+						
+                            int login = FALSE;
+                            int credit=0;
+                            if (loginMenu(email,password) == 1){
+                            	login = TRUE;
+                            	credit = 2;
+							}
+                            while (login==TRUE) {
+                                if (credit == 0){
+	                                system("cls");
+	                                printf("Maaf credit Anda sudah habis\n");
+	                                printf("Masukkan kode voucher untuk melanjutkan (+1 credit).\n");
+								}
+	                            menuUtamaLog();
+	                            printf("Silakan pilih tujuan Anda: ");
+	                            scanf("%d", &choiceLogin);
+	                            while (choiceLogin!=0){
+	                            	switch (choiceLogin) {
                                             case 1:
                                                 menuPetunjuk();
                                                 break;
-                                            case 2:
+                                            case 2: (credit>0) ? conversiAll (&credit) : printf("Maaf credit Anda sudah habis\n");
                                                 break;
-                                            case 3:
-                                                printf("Enter the amount to top up: ");
-                                                scanf("%d", &amount);
-                                                getchar();
-                                                topUpVoucher("code.txt");
-                                                printf("Top up berhasil dilakukan\n");
-                                                break;
+                                            case 3: printf("Enter the amount to top up: ");
+	                                                scanf("%d", &amount);
+	                                                topUpVoucher("code.txt");
+	                                                printf("Top up berhasil dilakukan\n");
+												break;
                                             case 4:
-                                                char kode[30];
-                                                code[MAX_VOUCHER_CODE + 1];
-                                                printf("Enter the code to redeem: ");
-                                                scanf("%s", code);
-                                                int redeemedAmount = redeemVoucher("code.txt", code);
-                                                if (redeemedAmount > 0) {
-                                                    credit+=1;
-                                                    printf("Sekarang anda memiliki %d credit tambahan", credit);
-                                                } else {
-                                                    printf("Invalid code or already redeemed.\n");
-                                                }
-                                                getch();
+                                            	{
+	                                            	char kode[30];
+	                                                code[MAX_VOUCHER_CODE + 1];
+	                                                printf("Enter the code to redeem: ");
+	                                                scanf("%s", code);
+	                                                int redeemedAmount = redeemVoucher("code.txt", code);
+	                                                if (redeemedAmount > 0) {
+	                                                    credit+=1;
+	                                                    printf("Sekarang anda memiliki %d credit tambahan\n", credit);
+	                                                    
+	                                                } else {
+	                                                    printf("Invalid code or already redeemed.\n");
+	                                                }
+												}
                                                 break;
-                                            default:
+                                            case 0:
+                                            	break;
+                                            default: printf("Invalid menu!\n");
                                                 break;
-                                        }                                        
-                                    } else {
-                                        printf("Masukkan suhu: ");
-                                        scanf("%f", &suhu);
-                                        getchar();
-                                        suhuAwal = toupper(suhuAwal);
-                                        switch (suhuAwal) {
-                                            case 'R':
-                                                reamur(suhu);
-                                                credit -= 1;
+                                    	}  	
+                                    system("pause");
+                                    system("cls");
+                                    printf("Anda memiliki %d credit\n", credit);
+                                    menuUtamaLog();
+		                            printf("Silakan pilih tujuan Anda: ");
+		                            scanf("%d", &choiceLogin);
+									}
+								}
+							}
+					    else if (strcmp(registChoice, "L") == 0 || strcmp(registChoice, "l") == 0){
+					    	system("cls");
+					    	int login = FALSE;
+                            int credit=0;
+                            if (loginMenu(email,password) == 1){
+                            	login = TRUE;
+                            	credit = 2;
+                            	printf("Sekarang Anda memiliki %d credit (1 credit/konversi)\n", credit);
+							}
+                            while (login==TRUE) {
+                                if (credit == 0){
+	                                system("cls");
+	                                printf("Maaf credit Anda sudah habis\n");
+	                                printf("Masukkan kode voucher untuk melanjutkan (+1 credit).\n");
+								}
+	                            menuUtamaLog();
+	                            printf("Silakan pilih tujuan Anda: ");
+	                            scanf("%d", &choiceLogin);
+	                            while (choiceLogin!=0){
+	                            	switch (choiceLogin) {
+                                            case 1:
+                                                menuPetunjuk();
                                                 break;
-                                            case 'C':
-                                                celcius(suhu);
-                                                credit -= 1;
+                                            case 2: (credit>0) ? conversiAll (&credit) : printf("Maaf credit Anda sudah habis\n Silahkan top up atau log out\n");
                                                 break;
-                                            case 'F':
-                                                fahrenheit(suhu);
-                                                credit -= 1;
+                                            case 3: printf("Enter the amount to top up: ");
+	                                                scanf("%d", &amount);
+	                                                topUpVoucher("code.txt");
+	                                                printf("Top up berhasil dilakukan\n");
+												break;
+                                            case 4:
+                                            	{
+	                                            	char kode[30];
+	                                                code[MAX_VOUCHER_CODE + 1];
+	                                                printf("Enter the code to redeem: ");
+	                                                scanf("%s", code);
+	                                                int redeemedAmount = redeemVoucher("code.txt", code);
+	                                                if (redeemedAmount > 0) {
+	                                                    credit+=1;
+	                                                    printf("Sekarang anda memiliki %d credit\n", credit);
+	                                                    
+	                                                } else {
+	                                                    printf("Invalid code or already redeemed.\n");
+	                                                }
+												}
                                                 break;
-                                            case 'K':
-                                                kelvin(suhu);
-                                                credit -= 1;
+                                            case 0:
+                                            	break;
+                                            default: printf("Invalid menu!\n");
                                                 break;
-                                            default:
-                                                printf("Input tidak valid. Silakan coba lagi.\n");
-                                                system("cls");
-                                        }
-                                        system("pause");
-                                        system("cls");
-                                        menuKonversi();
-                                        printf("Masukkan jenis suhu awal (R/C/F/K): ");
-                                    }
-                                }
-                                system("cls");
-                                break;
-                            }
-                        } 
-                    }
-
-                    printf("Masukkan suhu: ");
-                    scanf("%f", &suhu);
-                    getchar();
-                    suhuAwal = toupper(suhuAwal);
-                    switch (suhuAwal) {
-                        case 'R':
-                            reamur(suhu);
-                            tigakalipakai += 1;
-                            break;
-                        case 'C':
-                            celcius(suhu);
-                            tigakalipakai += 3;
-                            break;
-                        case 'F':
-                            fahrenheit(suhu);
-                            tigakalipakai += 1;
-                            break;
-                        case 'K':
-                            kelvin(suhu);
-                            tigakalipakai += 1;
-                            break;
-                        default:
-                            printf("Input tidak valid. Silakan coba lagi.\n");
-                            system("cls");
-                    }
-                    system("pause");
-                    system("cls");
-                    menuKonversi();
-                    printf("Masukkan jenis suhu awal (R/C/F/K): ");
-                }
-                system("cls");
+                                    	}  	
+                                    system("pause");
+                                    system("cls");
+                                    printf("Anda memiliki %d credit\n", credit);
+                                    menuUtamaLog();
+		                            printf("Silakan pilih tujuan Anda: ");
+		                            scanf("%d", &choiceLogin);
+									}
+								}
+                	} 
+                	system("pause");
+                	system("cls"); 
+				}
+				
                 break;
-            case 0:
+            case 0: 
                 break;
             default:
                 break;
-        }   
+        }
     } while (choice != 0);
     return 0;
 }
@@ -252,7 +299,6 @@ int loginMenu(char *email, char *password) {
                 if(strcmp(etemp, email) == 0 && strcmp(passtemp, password) == 0) { // Membandingkan email dan password
                     fclose(akun); // Tutup file
                     printf("Login sukses\n");
-                    printf("Sekarang Anda memiliki 10 credit (1 credit/konversi)\n");
                     return 1; // Login berhasil
                 }
             }
@@ -260,13 +306,14 @@ int loginMenu(char *email, char *password) {
             printf("Login gagal. Silakan coba lagi.\n");
         } 
     } while (choice != 0);
+    printf("Anda telah logout.\n");
     return 0; // Jika user memilih logout
 }
 
 void generateVoucherCode(char *code, int length) {
     const char charset[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    for (int i = 0; i < length; i++) {
+    int i;
+    for (i = 0; i < length; i++) {
         int index = rand() % (int)(sizeof(charset) - 1);
         code[i] = charset[index];
     }
@@ -283,17 +330,69 @@ void topUpVoucher(const char *filename) {
     fclose(filepoint);
 }
 
+void conversiAll (int *cr){
+	char suhuAwal;
+	int credit = *cr;
+	float suhu;
+	int convert = FALSE;
+										
+					                    int input = FALSE;
+										while (input==FALSE){
+											system("cls");
+											menuKonversi();
+							                printf("Masukkan jenis suhu awal (R/C/F/K): ");
+							                scanf(" %c", &suhuAwal);
+						                    input = TRUE;
+						                    suhuAwal = toupper(suhuAwal);
+							                switch (suhuAwal) {
+							                	case 'R':
+							               	    	break;
+							                	case 'C':
+							                        break;
+							                    case 'F':
+							                        break;
+							                    case 'K':
+							                        break;
+							                    default: input = FALSE;
+							                        break;
+							                }
+										}
+											printf("Masukkan suhu: ");
+							                scanf("%f", &suhu);
+							                switch (suhuAwal) {
+							                	case 'R':
+							                	    reamur(suhu);
+							                	    credit -= 1;
+							               	    	break;
+							                	case 'C':
+							                    	celcius(suhu);
+							                        credit -= 1;
+							                        break;
+							                    case 'F':
+							                        fahrenheit(suhu);
+							                        credit -= 1;
+							                        break;
+							                    case 'K':
+							                        kelvin(suhu);
+							                        credit -= 1;
+							                        break;
+							                    default:
+							                        break;
+							            }
+						                
+    *cr = credit;
+}
 
 int redeemVoucher(const char *filename, const char *code) {
     int n=0,temp,primo,primgems[250];
     char dum[200],read[20][200];
     FILE *fileredeem;
-    fileredeem = fopen(filename, "r");
+    fileredeem = fopen(filename, "r+");
     rewind(fileredeem);
 
-    while(fscanf(fileredeem, "%s %d", dum,&temp)) {
+    while(fscanf(fileredeem, "%s", dum)) {
         if(strcmp(dum,code)==0){
-            primo=temp;
+            primo=1;
             break;
         }
     }

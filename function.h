@@ -13,9 +13,9 @@ void printRainbowText(const char *text) {
         "\033[1;36m", // Cyan
         "\033[1;34m", // Blue
         "\033[1;35m"  // Magenta
-};
-
- for (int i = 0; i < text_length; i++) {
+	};
+	int i;
+ 	for (i = 0; i < text_length; i++) {
         printf("%s%c\033[0m", colors[color_index], text[i]);
 
         // Increment the color index, loop back to 0 if we reach the end of the color array
@@ -74,6 +74,18 @@ void menuUtama() {
     printf("+===========================+\n");
 }
     
+    
+void menuUtamaLog(){
+	printf("+======================================+\n");
+    printRainbowText("|   Program Konversi Suhu Menu         |\n");
+    printf("+======================================+\n");
+   	printf("| 1. Petunjuk                          |\n");
+    printf("| 2. Konversi                          |\n");
+    printf("| 3. TopUp dan Generate Voucher Code   |\n");
+    printf("| 4. Redeem Voucher Code               |\n");
+    printf("| 0. Keluar                            |\n");
+    printf("+======================================+\n");
+}
 void menuKonversi(){
 	printf("+=====================+\n");
     printf("|    Konversi Suhu    |\n");
