@@ -6,6 +6,12 @@
 #include <conio.h>
 #include "function.h"
 
+typedef struct {
+    char email[51];
+    char password[15];
+    int credit;
+} Account;
+
 #define MAX_VOUCHER_CODE 20
 #define MAX_REDEEMED_CODES 100 // Menentukan batas maksimum kode voucher yang dapat diredeem
 
@@ -25,6 +31,9 @@ int loginMenu(char *email, char *password);
 void generateVoucherCode(char *code, int length);
 void topUpVoucher(const char *filename);
 // int redeemVoucher(const char *filename, const char *code);
+int getCredit(const char *email);
+void saveAccountInfo(Account *account);
+void loadAccountInfo(Account *account);
 
 int main() {
     int amount;
@@ -38,7 +47,8 @@ int main() {
     char password[15]; // Variabel untuk menyimpan password
         char redeemedCodes[MAX_REDEEMED_CODES][MAX_VOUCHER_CODE + 1];
     int redeemedCount = 0;
-
+    Account account;
+    loadAccountInfo(&account);
 
     do {
         int choiceLogin = 0;
@@ -176,6 +186,8 @@ int main() {
                                         scanf("%d", &amount);
                                         topUpVoucher("code.txt");
                                         printf("Top up berhasil dilakukan\n");
+                                        ccount.credit += amount;
+                saveAccountInfo(&account);
                                         break;
                                     case 4:
 {
@@ -196,13 +208,17 @@ int main() {
     if (alreadyRedeemed) {
         printf("Invalid code or already redeemed.\n");
     } else {
+                            account.credit += 1;
+
         // Jika kode belum ada dalam daftar redeemedCodes, tambahkan ke daftar
         strcpy(redeemedCodes[redeemedCount], code);
         redeemedCount++;
 
         // Lakukan proses redeeming kode dan tambahkan credit jika berhasil
-        credit += 1;
-        printf("Sekarang anda memiliki %d credit\n", credit);
+        // credit += 1;
+        printf("Sekarang anda memiliki %d credit\n", account.credit);
+                            saveAccountInfo(&account);
+
     }
 }
 break;
@@ -221,6 +237,8 @@ break;
                                 printf("Silakan pilih tujuan Anda: ");
                                 scanf("%d", &choiceLogin);
                             }
+                                                        if (choiceLogin==0) break;
+
                         }
                     } else if (strcmp(registChoice, "L") == 0 || strcmp(registChoice, "l") == 0) {
                         system("cls");
@@ -228,7 +246,9 @@ break;
                         int credit = 0;
                         if (loginMenu(email, password) == 1) {
                             login = TRUE;
-                            credit = 1;
+                            // credit = 1;
+                                credit = getCredit(email);
+
                             printf("Sekarang Anda memiliki %d credit (1 credit/konversi)\n", credit);
                         }
                         while (login == TRUE) {
@@ -292,7 +312,7 @@ break;
                                         break;
                                 }
                                 if (choiceLogin == 0) {
-                                    login == FALSE;
+                                    login = FALSE;
                                 } else {
                                     system("pause");
                                     system("cls");
@@ -477,3 +497,42 @@ int redeemVoucher(const char *filename, const char *code, char redeemedCodes[][M
 //     return primo;
 // }
 
+int getCredit(const char *email) {
+    FILE *file = fopen("accounts.txt", "r");
+    if (file == NULL) {
+        printf("Error: Gagal membuka file akun.\n");
+        return 0;
+    }
+
+    Account account;
+    while (fscanf(file, "%s %s %d", account.email, account.password, &account.credit) != EOF) {
+        if (strcmp(account.email, email) == 0) {
+            fclose(file);
+            return account.credit;
+        }
+    }
+
+    fclose(file);
+    printf("Error: Akun dengan email '%s' tidak ditemukan.\n", email);
+    return 0;
+}
+
+void saveAccountInfo(Account *account) {
+    FILE *file = fopen("accounts.txt", "w");
+    if (file != NULL) {
+        fprintf(file, "%s %s %d\n", account->email, account->password, account->credit);
+        fclose(file);
+    } else {
+        printf("Error: Gagal menyimpan informasi akun.\n");
+    }
+}
+
+void loadAccountInfo(Account *account) {
+    FILE *file = fopen("accounts.txt", "r");
+    if (file != NULL) {
+        fscanf(file, "%s %s %d", account->email, account->password, &account->credit);
+        fclose(file);
+    } else {
+        printf("Error: Gagal memuat informasi akun.\n");
+    }
+}
